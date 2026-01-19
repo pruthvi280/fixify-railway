@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Activity Report</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 24px;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .table-container {
+            margin-top: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .summary {
+            margin-top: 20px;
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+        }
+        .summary p {
+            margin: 10px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #777;
+        }
+        .footer a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Monthly Activity Report - {{ month }}</h2>
+        <p>Dear {{ username }},</p>
+        <p>Here is your activity report for the month of {{ month }}:</p>
+
+        <h3>Service Details</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service Name</th>
+                        <th>Status</th>
+                        <th>Service Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detail in service_details %}
+                    <tr>
+                        <td>{{ detail.service_name }}</td>
+                        <td>{{ detail.status }}</td>
+                        <td>{{ detail.service_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="summary">
+            <p><strong>Total Services Requested:</strong> {{ completed_services + canceled_services }}</p>
+            <p><strong>Completed Services:</strong> {{ completed_services }}</p>
+            <p><strong>Cancelled Services:</strong> {{ canceled_services }}</p>
+        </div>
+
+        <p>Thank you for using Fixify! We appreciate your business.</p>
+
+        <div class="footer">
+            <p>Best Regards,<br>Fixify Team</p>
+            <p>Visit us at <a href=" http://localhost:5173/">Fixify</a></p>
+        </div>
+    </div>
+</body>
+</html>
+

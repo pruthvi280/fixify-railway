@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Booking Confirmation</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6fb;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      background: #667eea;
+      color: #ffffff;
+      padding: 20px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .content {
+      padding: 30px;
+      color: #333333;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .content p {
+      margin: 0 0 15px;
+    }
+
+    .details {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    .details p {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+
+    .details span {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 13px;
+      color: #777;
+      background: #fafafa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      Booking Confirmed
+    </div>
+
+    <div class="content">
+      <p>Hi <strong>{{ username }}</strong>,</p>
+
+      <p>
+        Your service booking has been successfully placed.
+        Below are the details of your booking:
+      </p>
+
+      <div class="details">
+        <p><span>Booking ID:</span> {{ booking_id }}</p>
+        <p><span>Service:</span> {{ service_name }}</p>
+        <p><span>Service Date:</span> {{ service_date }}</p>
+        <p><span>Booking Status:</span> {{ status }}</p>
+        <p><span>Booked On:</span> {{ booking_date }}</p>
+      </div>
+
+      <p style="margin-top: 20px;">
+        Our team will assign a professional shortly.
+        You will be notified once the service provider is assigned.
+      </p>
+
+      <p>
+        Thank you for choosing <strong>Fixify</strong> 🙌
+      </p>
+    </div>
+
+    <div class="footer">
+      © {{ booking_date[:4] }} Fixify. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>

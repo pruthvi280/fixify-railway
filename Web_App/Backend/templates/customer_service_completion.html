@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Service Completed</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6fb;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    .header {
+      background: #34a853;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    .content {
+      padding: 30px;
+      color: #333;
+      line-height: 1.6;
+    }
+    .details {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .details p {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    .footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 13px;
+      color: #777;
+      background: #fafafa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      Service Completed 🎉
+    </div>
+
+    <div class="content">
+      <p>Hi <strong>{{ username }}</strong>,</p>
+
+      <p>Your service has been successfully completed. Here are the details:</p>
+
+      <div class="details">
+        <p><strong>Booking ID:</strong> {{ booking_id }}</p>
+        <p><strong>Service:</strong> {{ service_name }}</p>
+        <p><strong>Service Date:</strong> {{ service_date }}</p>
+        <p><strong>Professional:</strong> {{ professional_name }}</p>
+      </div>
+
+      <p>
+        We hope you had a great experience!  
+        You can now leave a review and help others choose the best professionals.
+      </p>
+
+      <p>Thank you for choosing <strong>Fixify</strong> 🙌</p>
+    </div>
+
+    <div class="footer">
+      © 2026 Fixify. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>

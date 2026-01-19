@@ -1,0 +1,36 @@
+Web_App/myenv
+Web_App/__pycache__
+Web_App/Backend/__pycache__
+Web_App/instance
+Web_App/celerybeat-schedule.db
+Web_App/go1.21.5.linux-amd64.tar.gz
+Web_App/go1.21.5.linux-amd64.tar.gz.1
+
+
+node_modules
+
+# Environment & secrets
+.env
+*.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+myenv/
+venv/
+
+# Flask / instance
+instance/
+
+# Celery
+celerybeat-schedule.db
+
+# Node / frontend
+node_modules/
+dist/
+
+# OS files
+.DS_Store
