@@ -40,3 +40,6 @@ gevent>=22.8
 # pyexcel-xls
 # pyexcel-xlsx
 
+gunicorn
+
+
