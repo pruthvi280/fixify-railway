@@ -41,5 +41,6 @@ gevent>=22.8
 # pyexcel-xlsx
 
 gunicorn
+flask-excel
 
 
