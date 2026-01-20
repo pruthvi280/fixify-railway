@@ -1,0 +1,45 @@
+# Core Flask
+Flask>=2.2,<3.1
+Werkzeug<3.1
+
+# Flask Extensions
+Flask-Cors>=3.0
+Flask-JWT-Extended>=4.4,<4.7
+Flask-Login>=0.6
+Flask-Mail>=0.9
+Flask-RESTful>=0.3
+Flask-SQLAlchemy>=3.0
+Flask-Caching>=2.0
+
+# Database
+SQLAlchemy>=1.4,<3.0
+
+# Celery & Redis
+celery>=5.2,<6
+redis>=4.5
+amqp>=5.1
+billiard>=4.0
+kombu>=5.2
+vine>=5.0
+
+# Utilities
+click>=8.0
+itsdangerous>=2.1
+Jinja2>=3.0
+MarkupSafe>=2.1
+python-dateutil
+pytz
+six
+
+# Async / Server
+gevent>=22.8
+
+# Optional (commented)
+# flask-excel
+# pyexcel
+# pyexcel-xls
+# pyexcel-xlsx
+
+gunicorn
+flask-excel
+eventlet>=0.33
