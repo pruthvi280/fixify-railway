@@ -7,6 +7,7 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'https://lively-passion-production-692a.up.railway.app';
 
 axios.interceptors.response.use(
   (response) => response,
