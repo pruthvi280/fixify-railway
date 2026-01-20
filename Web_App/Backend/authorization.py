@@ -72,7 +72,7 @@ class SignUp(Resource):
       db.session.add(new_user)
       db.session.commit()
     
-      token_access=create_access_token(identity={"id":str(new_user.id),"role":new_user.role}, expires_delta=timedelta(hours=3))
+      token_access=create_access_token(identity={"id":new_user.id,"role":new_user.role}, expires_delta=timedelta(hours=3))
 
       response = {
         "user_id": new_user.id,
@@ -87,9 +87,8 @@ class SignUp(Resource):
     # If role is professional, create a Professional record
     elif role == "professional":
 
-      FILE_NAME = "uploads"
-      UPLOAD_FOLDER = os.path.join('static', FILE_NAME)
-      print(UPLOAD_FOLDER)
+      from flask import current_app
+      UPLOAD_FOLDER = current_app.config.get('UPLOAD_FOLDER', '/app/storage/uploads') 
       os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
       # Handle file upload
@@ -104,7 +103,7 @@ class SignUp(Resource):
       file.save(file_path)
 
         # Validate service_id if provided
-      path = "/static/uploads/"+file.filename
+      path = file.filename
       if service:
           service = Service.query.filter_by(name = service).first()
           print(service)
@@ -181,7 +180,7 @@ class Login(Resource):
             return {"approved": False, "message": "User is not approved yet"}, 200
 
         # Generate JWT Token
-        token_access = create_access_token(identity={"id": str(user.id), "role": user.role},expires_delta=timedelta(hours=3))
+        token_access = create_access_token(identity={"id": user.id, "role": user.role},expires_delta=timedelta(hours=3))
 
         response = {
             "user_id": user.id,
