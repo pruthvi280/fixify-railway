@@ -4,7 +4,7 @@ class Config:
     # Flask
     SECRET_KEY = os.getenv("SECRET_KEY", "my_secret_key")
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "super_secret")
-    
+
     # Database
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL",
@@ -13,23 +13,21 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ["access"]
-    
+
     # Redis
     REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
-    
-    # Celery
+
+    # Celery (Legacy config, kept for compatibility)
     CELERY = {
         "broker_url": os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0"),
         "result_backend": os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0"),
         "task_ignore_result": True,
     }
-    # # Mail Configuration
-    # MAIL_SERVER = "smtp.gmail.com"
-    # MAIL_PORT = 465
-    # MAIL_USERNAME = "pruthviprasad280@gmail.com"  # Change it from your mail id
-    # MAIL_PASSWORD = "ieyy glbe escr dmib"  # Change the password accordingly.
-    # MAIL_USE_TLS = False
-    # MAIL_USE_SSL = True
-    
-    
 
+    # Mail Configuration (Secure - reads from Railway Variables)
+    MAIL_SERVER = "smtp.gmail.com"
+    MAIL_PORT = 465
+    MAIL_USERNAME = os.getenv("MAIL_USERNAME")
+    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = True
