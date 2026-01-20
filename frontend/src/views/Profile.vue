@@ -109,7 +109,8 @@ export default {
     // Fetch Profile Data
     const fetchProfile = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/profile", {
+        //  FIX: Use relative path (works on both Localhost and Railway)
+        const response = await axios.get("/profile", {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
 
@@ -118,9 +119,10 @@ export default {
           email: response.data.email,
           phone: response.data.phone || "",
           address: response.data.address || "",
-          role: response.data.role, // Store role dynamically
+          role: response.data.role, 
         };
       } catch (error) {
+        console.error(error); // Log error to see what happens
         errorMessage.value = "Failed to load profile. Please try again.";
       }
     };
@@ -128,10 +130,11 @@ export default {
     // Update Profile
     const updateProfile = async () => {
       try {
+        //  Use relative path here too
         await axios.put(
-          "http://localhost:5000/profile",
+          "/profile",
           {
-            fullName: profile.value.fullName, // Allow name update
+            fullName: profile.value.fullName, 
             phone: profile.value.phone,
             address: profile.value.address,
           },
@@ -141,6 +144,7 @@ export default {
         );
         alert("Profile updated successfully!");
       } catch (error) {
+        console.error(error);
         errorMessage.value = "Failed to update profile. Please try again.";
       }
     };

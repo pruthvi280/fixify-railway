@@ -11,6 +11,7 @@ import time
 from Backend.celery.tasks import export_closed_service_requests_csv,send_customer_booking_confirmation,send_service_completion_email
 from celery.result import AsyncResult 
 from collections import Counter
+from flask import send_from_directory
 
 
 api_blueprint = Blueprint('api', __name__)

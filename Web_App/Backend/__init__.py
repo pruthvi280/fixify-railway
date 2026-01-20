@@ -63,5 +63,12 @@ def create_app():
             )
             db.session.add(admin_user)
             db.session.commit()
+    from flask import send_from_directory
+    
+    @app.route('/uploads/<path:filename>')
+    def serve_uploaded_file(filename):
+        upload_folder = app.config.get('UPLOAD_FOLDER', '/app/storage/uploads')
+        return send_from_directory(upload_folder, filename)
 
+    return app
     return app
