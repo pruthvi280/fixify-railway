@@ -1,6 +1,6 @@
 from flask_restful import Api, reqparse, fields, marshal_with, abort, Resource
 from flask import Blueprint, request, jsonify,send_file,url_for
-from .authorization import SignUp, Login, Logout
+from .authorization import SignUp, Login, Logout,Ping
 from .models import User,Category, Service, db,Professional,Booking,Customer,Review,Payment,Professional_rejected_bookings
 import os
 from flask_jwt_extended import get_jwt_identity,jwt_required
@@ -20,6 +20,8 @@ api = Api(api_blueprint)
 api.add_resource(SignUp, '/signup')
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
+api.add_resource(Ping, "/ping")
+
 
 
 category_fields = {

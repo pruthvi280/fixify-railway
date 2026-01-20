@@ -210,3 +210,6 @@ class Logout(Resource):
 
 
 
+class Ping(Resource):
+    def get(self):
+        return {"message": "Backend is alive"}, 200
