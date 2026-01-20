@@ -9,7 +9,7 @@ celery_app=app.extensions['celery']
 @celery_app.on_after_configure.connect
 def setup_periodic_task2(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(minute='*/1'),
+        crontab(minute='*/5'),
         pending_bookings_reminder.s(),
     )
 
@@ -17,7 +17,7 @@ def setup_periodic_task2(sender, **kwargs):
 def setup_periodic_tasks3(sender, **kwargs):
     
     sender.add_periodic_task(
-        (5000000), 
+        (50000000),  # Approximately every 30 days
         send_monthly_activity_report.s(),
     )
 

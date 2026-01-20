@@ -4,13 +4,14 @@ import csv
 from datetime import datetime
 from Backend.models import Professional, User, Booking,Service,Customer
 from flask import current_app,render_template
-import flask_excel as excel
+# import flask_excel as excel
 from Backend.celery.mail import send_mail
 from datetime import datetime, timedelta
 
 
 @shared_task(bind=True, ignore_result=False)
 def export_closed_service_requests_csv(self):
+    import flask_excel as excel 
     print(" Starting CSV generation for closed service requests...")
 
  
