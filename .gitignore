@@ -30,7 +30,6 @@ celerybeat-schedule.db
 
 # Node / frontend
 node_modules/
-dist/
 
 # OS files
 .DS_Store

@@ -42,5 +42,4 @@ gevent>=22.8
 
 gunicorn
 flask-excel
-
-
+eventlet>=0.33
