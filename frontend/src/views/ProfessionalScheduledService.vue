@@ -40,7 +40,7 @@ export default {
       }
       try {
         console.log(`Fetching scheduled services for Professional ID: ${professionalId.value}`);
-        const response = await axios.get("http://127.0.0.1:5000/professional/scheduled_bookings");
+        const response = await axios.get("/professional/scheduled_bookings");
         console.log("Scheduled Services Data:", response.data);
         scheduledServices.value = response.data;
       } catch (error) {

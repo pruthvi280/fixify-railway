@@ -70,7 +70,7 @@ export default {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const response = await axios.get("http://127.0.0.1:5000/completedbookings", {
+        const response = await axios.get("/completedbookings", {
           headers: { Authorization: `Bearer ${token}` },
         });
 

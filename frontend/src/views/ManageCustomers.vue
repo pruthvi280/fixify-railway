@@ -66,7 +66,7 @@ export default {
 
     const fetchCustomers = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/managecustomers");
+        const response = await axios.get("/managecustomers");
         customers.value = response.data;
       } catch (error) {
         console.error("Error fetching customers:", error);
@@ -77,7 +77,7 @@ export default {
       console.log(`Toggling block status for user_id: ${customer.user_id}`);
 
       try {
-        const response = await axios.put(`http://127.0.0.1:5000/managecustomers/${customer.user_id}`);
+        const response = await axios.put(`/managecustomers/${customer.user_id}`);
         alert(response.data.message);
 
         // Update UI instantly
@@ -91,7 +91,7 @@ export default {
       if (!confirm(`Are you sure you want to delete ${customer.username}?`)) return;
 
       try {
-        const response = await axios.delete(`http://127.0.0.1:5000/managecustomers/${customer.user_id}`);
+        const response = await axios.delete(`/managecustomers/${customer.user_id}`);
         alert(response.data.message);
 
         // Remove deleted customer from list

@@ -57,7 +57,7 @@ export default {
     const fetchCompletedServices = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://127.0.0.1:5000/servicehistory", {
+        const response = await axios.get("/servicehistory", {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log("API Response:", response.data);

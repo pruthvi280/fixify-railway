@@ -130,13 +130,13 @@ const search = async () => {
   try {
     let url, queryParams = {};
     if (userRole.value === "admin") {
-      url = "http://127.0.0.1:5000/searchprofessionals";
+      url = "/searchprofessionals";
       if (searchType.value === "name") queryParams.name = searchParams.value.name;
       if (searchType.value === "service") queryParams.service_name = searchParams.value.service_name;
       if (searchType.value === "status") queryParams.status = searchParams.value.status;
       if (searchType.value === "rating")queryParams.max_rating = "2"; 
     } else {
-      url = "http://127.0.0.1:5000/searchservices";
+      url = "/searchservices";
       if (searchType.value === "service_name") queryParams.service_name = searchParams.value.service_name;
       if (searchType.value === "location") queryParams.location = searchParams.value.location;
     }
@@ -150,7 +150,7 @@ const search = async () => {
 
 const fetchServices = async () => {
   try {
-    const response = await axios.get("http://127.0.0.1:5000/getservices");
+    const response = await axios.get("/getservices");
     services.value = Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     console.error("🚨 Error fetching services:", error);
@@ -163,7 +163,7 @@ const toggleBlockStatus = async (professional) => {
     const newStatus = professional.status === "Blocked" ? "Approved" : "Blocked";
 
     // Send PUT request to update status
-    const response = await axios.put(`http://127.0.0.1:5000/professionals/${professional.id}`, {
+    const response = await axios.put(`/professionals/${professional.id}`, {
       status: newStatus
     });
 

@@ -76,7 +76,7 @@ const fetchBookingDetails = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    const response = await axios.get(`http://127.0.0.1:5000/booking/${props.bookingId}`, {
+    const response = await axios.get(`/booking/${props.bookingId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -99,7 +99,7 @@ const submitReview = async () => {
     if (!token) return;
 
     const response = await axios.post(
-      `http://127.0.0.1:5000/feedback/${props.bookingId}`,
+      `/feedback/${props.bookingId}`,
       { rating:rating.value, feedback:feedback.value },
       { headers: { Authorization: `Bearer ${token}` } }
     );

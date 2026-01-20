@@ -82,7 +82,7 @@ export default {
 
     const fetchProfessionals = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/professionals");
+        const response = await axios.get("/professionals");
         professionals.value = response.data;
       } catch (error) {
         console.error("Error fetching professionals:", error);
@@ -91,7 +91,7 @@ export default {
 
     const updateStatus = async (id, newStatus) => {
       try {
-        await axios.put(`http://127.0.0.1:5000/professionals/${id}`, { status: newStatus });
+        await axios.put(`/professionals/${id}`, { status: newStatus });
         professionals.value = professionals.value.map(professional =>
           professional.id === id ? { ...professional, status: newStatus } : professional
         );
@@ -102,7 +102,7 @@ export default {
 
     const deleteProfessional = async (id) => {
       try {
-        await axios.delete(`http://127.0.0.1:5000/professionals/${id}`);
+        await axios.delete(`/professionals/${id}`);
         professionals.value = professionals.value.filter(professional => professional.id !== id);
       } catch (error) {
         console.error("Error deleting professional:", error);

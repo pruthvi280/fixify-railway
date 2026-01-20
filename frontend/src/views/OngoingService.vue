@@ -89,7 +89,7 @@ export default {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const response = await axios.get("http://127.0.0.1:5000/ongoingservices", {
+        const response = await axios.get("/ongoingservices", {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -111,7 +111,7 @@ export default {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        await axios.put(`http://127.0.0.1:5000/bookings/${bookingId}/update-date`,
+        await axios.put(`/bookings/${bookingId}/update-date`,
           { scheduled_date: newScheduledDate.value },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -131,7 +131,7 @@ export default {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        await axios.post(`http://127.0.0.1:5000/cancelbooking/${bookingId}`, {}, {
+        await axios.post(`/cancelbooking/${bookingId}`, {}, {
           headers: { Authorization: `Bearer ${token}` }
         });
 

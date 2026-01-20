@@ -70,7 +70,7 @@ const error = ref(null);
 const fetchBookings = async () => {
   try {
     const token = localStorage.getItem("token");
-    const response = await axios.get("http://127.0.0.1:5000/mybookings", {
+    const response = await axios.get("/mybookings", {
       headers: { Authorization: `Bearer ${token}` },
     });
     bookings.value = response.data;

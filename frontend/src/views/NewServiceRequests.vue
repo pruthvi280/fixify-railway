@@ -62,7 +62,7 @@ export default {
 
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/categories");
+        const response = await axios.get("/categories");
         categories.value = response.data;
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -72,7 +72,7 @@ export default {
     const selectCategory = async (category) => {
       selectedCategory.value = category;
       try {
-        const response = await axios.get(`http://127.0.0.1:5000/getservices/${category.id}`);
+        const response = await axios.get(`/getservices/${category.id}`);
         selectedCategory.value.services = response.data;
       } catch (error) {
         console.error("Error fetching services:", error);
@@ -95,7 +95,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "http://127.0.0.1:5000/request_service",
+          "/request_service",
           { service_id: service.id, service_date: selectedDate.value },
           { headers: { Authorization: `Bearer ${token}` } }
         );

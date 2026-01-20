@@ -80,7 +80,7 @@ export default {
     
     const fetchServices = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/services");
+        const response = await axios.get("/services");
         services.value = response.data;
       } catch (error) {
         console.error("Error fetching services:", error);
@@ -119,7 +119,7 @@ export default {
       }
 
       try {
-        const response = await axios.post("http://127.0.0.1:5000/signup", formData, {
+        const response = await axios.post("/signup", formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
 

@@ -36,10 +36,10 @@ export default {
     // Fetch API Data
     const fetchData = async () => {
       try {
-        const userResponse = await axios.get("http://127.0.0.1:5000/admin/user-stats");
+        const userResponse = await axios.get("/admin/user-stats");
         userStats.value = userResponse.data;
 
-        const serviceResponse = await axios.get("http://127.0.0.1:5000/admin/service-stats");
+        const serviceResponse = await axios.get("/admin/service-stats");
         serviceStats.value = serviceResponse.data;
 
         renderCharts(); // Render charts after fetching data

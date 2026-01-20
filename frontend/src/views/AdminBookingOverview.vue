@@ -65,7 +65,7 @@ export default {
   methods: {
     async fetchBookings() {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/bookingsoverview")
+        const response = await axios.get("/bookingsoverview")
         this.bookings = response.data.bookings;
       } catch (err) {
         this.error = "Failed to fetch bookings.";

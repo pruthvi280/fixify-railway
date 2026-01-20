@@ -102,7 +102,7 @@ export default {
         }
 
         const response = await axios.post(
-          "http://127.0.0.1:5000/payments",
+          "/payments",
           {
             booking_id: booking.value.bookingId,
             amount: booking.value.amount,

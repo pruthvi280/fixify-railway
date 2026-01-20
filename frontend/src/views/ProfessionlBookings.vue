@@ -49,7 +49,7 @@ export default {
 
       try {
         console.log(`Fetching service requests for Professional ID: ${professionalId.value}`);
-        const response = await axios.get("http://127.0.0.1:5000/professional/bookings", {
+        const response = await axios.get("/professional/bookings", {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // Send JWT token
         });
         console.log("Service Requests Data:", response.data);
@@ -63,7 +63,7 @@ export default {
     const updateStatus = async (bookingId, status) => {
       try {
         const response = await axios.put(
-          `http://127.0.0.1:5000/professional/bookings/update/${bookingId}`,
+          `/professional/bookings/update/${bookingId}`,
           { status },
           {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // Send JWT token

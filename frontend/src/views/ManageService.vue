@@ -147,14 +147,14 @@ export default {
 
 
     fetchCategories() {
-      axios.get("http://127.0.0.1:5000/categories")
+      axios.get("/categories")
         .then(response => this.categories = response.data)
         .catch(error => console.error("Error fetching categories:", error));
     },
 
 
     fetchServices() {
-      axios.get("http://127.0.0.1:5000/services")
+      axios.get("/services")
         .then(response => this.services = response.data)
         .catch(error => console.error("Error fetching services:", error));
     },
@@ -191,7 +191,7 @@ export default {
       }
 
       try {
-        await axios.post("http://127.0.0.1:5000/categories", { name: this.newCategory });
+        await axios.post("/categories", { name: this.newCategory });
         this.newCategory = "";
         this.categoryModal.hide();
         this.fetchCategories();
@@ -215,11 +215,11 @@ export default {
       try {
         if (this.editingServiceId) {
 
-          await axios.put(`http://127.0.0.1:5000/services/${this.editingServiceId}`, this.newService);
+          await axios.put(`/services/${this.editingServiceId}`, this.newService);
           alert(" Service updated successfully!");
         } else {
 
-          await axios.post("http://127.0.0.1:5000/services", this.newService);
+          await axios.post("/services", this.newService);
           alert(" Service added successfully!");
         }
         this.serviceModal.hide(); // Close modal after successful action
@@ -251,7 +251,7 @@ export default {
     async deleteCategory(categoryId) {
       if (confirm("Are you sure you want to delete this category?")) {
         try {
-          await axios.delete(`http://127.0.0.1:5000/categories/${categoryId}`);
+          await axios.delete(`/categories/${categoryId}`);
           alert(" Category deleted successfully!");
           this.fetchCategories(); // Refresh category list
         } catch (error) {
@@ -269,7 +269,7 @@ export default {
     async deleteService(serviceId) {
       if (confirm("Are you sure you want to delete this service?")) {
         try {
-          await axios.delete(`http://127.0.0.1:5000/services/${serviceId}`);
+          await axios.delete(`/services/${serviceId}`);
           alert(" Service deleted successfully!");
           this.fetchServices(); // Refresh after deletion
         } catch (error) {

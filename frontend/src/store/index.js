@@ -43,7 +43,7 @@ const store = createStore({
       try {
         const token = store.state.token;
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        await axios.post('http://127.0.0.1:5000/logout'); // Call logout API
+        await axios.post('/logout'); // Call logout API
       } catch (error) {
         console.error('Logout failed:', error);
       }

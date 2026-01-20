@@ -88,7 +88,7 @@ export default {
     // ✅ Fetch Dashboard Stats
     async fetchDashboardStats() {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/adminstats");
+        const response = await axios.get("/adminstats");
         this.totalCustomers = response.data.total_customers;
         this.totalServices = response.data.total_services;
         this.newBookings = response.data.new_bookings;
@@ -100,7 +100,7 @@ export default {
     // ✅ Fetch Popular Services
     async fetchPopularService() {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/most_popular_service");
+        const response = await axios.get("/most_popular_service");
         this.popularServices = response.data.most_popular_services || [];
       } catch (error) {
         console.error("Error fetching popular service:", error);
@@ -115,7 +115,7 @@ export default {
       this.fileName = null;
 
       try {
-        const response = await axios.get("http://127.0.0.1:5000/create-csv");
+        const response = await axios.get("/create-csv");
         this.taskId = response.data.task_id;
         this.checkCSVStatus();
       } catch (error) {
@@ -129,7 +129,7 @@ export default {
     async checkCSVStatus() {
       const interval = setInterval(async () => {
         try {
-          const response = await axios.get(`http://127.0.0.1:5000/get-csv-data/${this.taskId}`);
+          const response = await axios.get(`/get-csv-data/${this.taskId}`);
 
           if (response.status === 200) {
             clearInterval(interval);

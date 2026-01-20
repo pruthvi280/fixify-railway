@@ -81,7 +81,7 @@ export default {
         formData.append("address", form.value.address);
         formData.append("role", "customer");
 
-        const response = await axios.post("http://127.0.0.1:5000/signup", formData, {
+        const response = await axios.post("/signup", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
 

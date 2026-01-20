@@ -69,7 +69,7 @@ export default {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const response = await axios.get("http://127.0.0.1:5000/profile", {
+        const response = await axios.get("/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -88,7 +88,7 @@ export default {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const response = await axios.get("http://127.0.0.1:5000/bookingstats", {
+        const response = await axios.get("/bookingstats", {
           headers: { Authorization: `Bearer ${token}` },
         });
         stats.value = response.data;
