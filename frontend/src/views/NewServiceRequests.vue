@@ -36,7 +36,7 @@
                   :id="'date-' + service.id"
                   :key="'date-input-' + service.id" 
                   type="date" 
-                  v-model="service.selected_date" 
+                  v-model="serviceDates[service.id]"
                   class="form-control mb-2" 
                   :min="todayDate" 
                 />
@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import store from "@/store";
@@ -62,7 +62,7 @@ export default {
   setup() {
     const categories = ref([]);
     const selectedCategory = ref(null);
-    // Removed global selectedDate = ref(""); 
+    const serviceDates = reactive({});
     const router = useRouter();
 
     const customerName = computed(() => store.state.user ? store.state.user.username : "customer");
@@ -81,12 +81,12 @@ export default {
       selectedCategory.value = category;
       try {
         const response = await axios.get(`/getservices/${category.id}`);
+        selectedCategory.value.services = response.data;
         
-        //  Initialize 'selected_date' property for each service so Vue can track it individually
-        selectedCategory.value.services = response.data.map(service => ({
-          ...service,
-          selected_date: "" 
-        }));
+        // Initialize dates for each service
+        response.data.forEach(service => {
+          serviceDates[service.id] = "";
+        });
 
       } catch (error) {
         console.error("Error fetching services:", error);
@@ -102,8 +102,7 @@ export default {
         return;
       }
 
-      //  Check the specific service's date
-      if (!service.selected_date) {
+      if (!serviceDates[service.id]) {
         alert("Please select a service date for this service.");
         return;
       }
@@ -111,16 +110,14 @@ export default {
       try {
         const response = await axios.post(
           "/request_service",
-          // Send the specific service's date
-          { service_id: service.id, service_date: service.selected_date },
+          { service_id: service.id, service_date: serviceDates[service.id] },
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
         console.log("Service requested successfully:", response.data);
-        alert(`Service '${service.name}' requested successfully for ${service.selected_date}!`);
+        alert(`Service '${service.name}' requested successfully for ${serviceDates[service.id]}!`);
         
-        // Optional: Reset just this service's date after booking
-        service.selected_date = ""; 
+        serviceDates[service.id] = "";
         
       } catch (error) {
         console.error("Error requesting service:", error.response);
@@ -139,7 +136,7 @@ export default {
     return {
       categories,
       selectedCategory,
-      // selectedDate, // Removed from return
+      serviceDates,
       customerName,
       todayDate,
       selectCategory,
