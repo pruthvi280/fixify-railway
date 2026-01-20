@@ -9,10 +9,21 @@ from .models import User
 from .api import api_blueprint
 from . import flask_mail
 from .config import Config
+import os  # <--- Make sure this is imported
 
 def create_app():
     app = Flask(__name__, static_folder="static")
     app.config.from_object(Config)
+
+    # ✅ NEW: Create the permanent upload folder immediately
+    # This prevents the "File Not Found" error when professionals sign up.
+    upload_folder = app.config.get('UPLOAD_FOLDER', '/app/storage/uploads')
+    if not os.path.exists(upload_folder):
+        try:
+            os.makedirs(upload_folder)
+            print(f"✅ Created permanent upload folder at: {upload_folder}")
+        except Exception as e:
+            print(f"❌ Error creating upload folder: {e}")
 
     db.init_app(app)
     CORS(app)

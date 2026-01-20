@@ -23,6 +23,7 @@
             <h3 class="category-heading">Quality Services in "{{ selectedCategory.name }}" – Just for You!</h3>
             <button @click="selectedCategory = null" class="btn btn-secondary">Back to Categories</button>
           </div>
+          
           <div v-for="service in selectedCategory.services" :key="service.id" class="col-md-4 mb-4">
             <div class="card service-card">
               <div class="card-body">
@@ -30,8 +31,14 @@
                 <p class="card-text">{{ service.description }}</p>
                 <p class="card-text price-text"><strong>Price: </strong> ₹{{ service.base_price }}</p>
 
-                <label for="service-date">Select Service Date:</label>
-                <input type="date" v-model="selectedDate" class="form-control mb-2" :min="todayDate" />
+                <label :for="'date-' + service.id">Select Service Date:</label>
+                <input 
+                  :id="'date-' + service.id" 
+                  type="date" 
+                  v-model="service.selected_date" 
+                  class="form-control mb-2" 
+                  :min="todayDate" 
+                />
 
                 <button @click="requestService(service)" class="btn btn-success request-btn">Request Service</button>
               </div>
@@ -54,7 +61,7 @@ export default {
   setup() {
     const categories = ref([]);
     const selectedCategory = ref(null);
-    const selectedDate = ref("");
+    // Removed global selectedDate = ref(""); 
     const router = useRouter();
 
     const customerName = computed(() => store.state.user ? store.state.user.username : "customer");
@@ -73,7 +80,13 @@ export default {
       selectedCategory.value = category;
       try {
         const response = await axios.get(`/getservices/${category.id}`);
-        selectedCategory.value.services = response.data;
+        
+        //  Initialize 'selected_date' property for each service so Vue can track it individually
+        selectedCategory.value.services = response.data.map(service => ({
+          ...service,
+          selected_date: "" 
+        }));
+
       } catch (error) {
         console.error("Error fetching services:", error);
       }
@@ -88,21 +101,26 @@ export default {
         return;
       }
 
-      if (!selectedDate.value) {
-        alert("Please select a service date.");
+      //  Check the specific service's date
+      if (!service.selected_date) {
+        alert("Please select a service date for this service.");
         return;
       }
 
       try {
         const response = await axios.post(
           "/request_service",
-          { service_id: service.id, service_date: selectedDate.value },
+          // Send the specific service's date
+          { service_id: service.id, service_date: service.selected_date },
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
         console.log("Service requested successfully:", response.data);
-        alert(`Service '${service.name}' requested successfully for ${selectedDate.value}!`);
-        selectedDate.value = "";
+        alert(`Service '${service.name}' requested successfully for ${service.selected_date}!`);
+        
+        // Optional: Reset just this service's date after booking
+        service.selected_date = ""; 
+        
       } catch (error) {
         console.error("Error requesting service:", error.response);
 
@@ -120,7 +138,7 @@ export default {
     return {
       categories,
       selectedCategory,
-      selectedDate,
+      // selectedDate, // Removed from return
       customerName,
       todayDate,
       selectCategory,
@@ -129,8 +147,6 @@ export default {
   },
 };
 </script>
-
-
 <style scoped>
 
 .container {

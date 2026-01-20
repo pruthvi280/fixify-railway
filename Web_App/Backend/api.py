@@ -162,6 +162,7 @@ api.add_resource(MyService, '/services', '/services/<int:service_id>')
 
 
 class ManageProfessionals(Resource):
+    
     def get(self):
       professionals = User.query.filter_by(role="professional").all()
 
@@ -1019,12 +1020,19 @@ class SearchServices(Resource):
         return {"message": "No services found"}, 200
 
     services = [
-        {"id": service.id, "service_name": service.name, "description": service.description, "base_price": service.base_price}
+        {
+            "id": service.id, 
+            "service_name": service.name, 
+            "description": service.description, 
+            "base_price": service.base_price,
+            "category_id": service.category_id  # <--- ✅ THIS IS THE FIX
+        }
         for service in results
     ]
     return {"services": services}, 200
 
 api.add_resource(SearchServices, "/searchservices")
+
 
 #Admin search professionals by service and name
 class SearchProfessionals(Resource):
