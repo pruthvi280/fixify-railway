@@ -91,7 +91,10 @@ export default {
         const response = await axios.get("/bookingstats", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        stats.value = response.data;
+        stats.value = {
+          ...response.data,
+          name: store.state.user ? store.state.user.username : "Customer"
+        };
       } catch (error) {
         console.error("Error fetching booking stats:", error);
       } finally {
