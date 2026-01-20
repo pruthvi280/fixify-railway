@@ -33,7 +33,8 @@
 
                 <label :for="'date-' + service.id">Select Service Date:</label>
                 <input 
-                  :id="'date-' + service.id" 
+                  :id="'date-' + service.id"
+                  :key="'date-input-' + service.id" 
                   type="date" 
                   v-model="service.selected_date" 
                   class="form-control mb-2" 
