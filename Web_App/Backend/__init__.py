@@ -71,4 +71,3 @@ def create_app():
         return send_from_directory(upload_folder, filename)
 
     return app
-    return app
