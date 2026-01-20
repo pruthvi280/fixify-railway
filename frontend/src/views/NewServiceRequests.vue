@@ -24,7 +24,7 @@
             <button @click="selectedCategory = null" class="btn btn-secondary">Back to Categories</button>
           </div>
           
-          <div v-for="service in selectedCategory.services" :key="service.id" class="col-md-4 mb-4">
+          <div v-for="(service, index) in servicesWithDates" :key="service.id" class="col-md-4 mb-4">
             <div class="card service-card">
               <div class="card-body">
                 <h5 class="card-title service-title">{{ service.name }}</h5>
@@ -32,15 +32,13 @@
                 <p class="card-text price-text"><strong>Price: </strong> ₹{{ service.base_price }}</p>
 
                 <label :for="'date-' + service.id">Select Service Date:</label>
-                <p style="color: red; font-size: 12px;">DEBUG: Service ID={{ service.id }}, Date={{ serviceDates[service.id] }}</p>
                 <input 
                   :id="'date-' + service.id"
-                  :key="'date-input-' + service.id" 
                   type="date" 
-                  v-model="serviceDates[service.id]"
+                  :value="service.selectedDate"
+                  @input="updateServiceDate(index, $event.target.value)"
                   class="form-control mb-2" 
-                  :min="todayDate"
-                  @input="logDateChange(service.id)"
+                  :min="todayDate" 
                 />
 
                 <button @click="requestService(service)" class="btn btn-success request-btn">Request Service</button>
@@ -54,7 +52,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, reactive } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import store from "@/store";
@@ -64,7 +62,7 @@ export default {
   setup() {
     const categories = ref([]);
     const selectedCategory = ref(null);
-    const serviceDates = reactive({});
+    const servicesWithDates = ref([]);
     const router = useRouter();
 
     const customerName = computed(() => store.state.user ? store.state.user.username : "customer");
@@ -83,24 +81,21 @@ export default {
       selectedCategory.value = category;
       try {
         const response = await axios.get(`/getservices/${category.id}`);
-        selectedCategory.value.services = response.data;
         
-        // Initialize dates for each service
-        response.data.forEach(service => {
-          serviceDates[service.id] = "";
-          console.log(`Initialized service ${service.id} with empty date`);
-        });
-        
-        console.log("All service dates after init:", JSON.stringify(serviceDates));
+        // Create new array with selectedDate property
+        servicesWithDates.value = response.data.map(service => ({
+          ...service,
+          selectedDate: ""
+        }));
 
       } catch (error) {
         console.error("Error fetching services:", error);
       }
     };
 
-    const logDateChange = (serviceId) => {
-      console.log(`Service ${serviceId} date changed to: ${serviceDates[serviceId]}`);
-      console.log("Current all dates:", JSON.stringify(serviceDates));
+    const updateServiceDate = (index, newDate) => {
+      servicesWithDates.value[index].selectedDate = newDate;
+      console.log(`Updated service ${servicesWithDates.value[index].id} at index ${index} to ${newDate}`);
     };
 
     const requestService = async (service) => {
@@ -112,7 +107,7 @@ export default {
         return;
       }
 
-      if (!serviceDates[service.id]) {
+      if (!service.selectedDate) {
         alert("Please select a service date for this service.");
         return;
       }
@@ -120,14 +115,14 @@ export default {
       try {
         const response = await axios.post(
           "/request_service",
-          { service_id: service.id, service_date: serviceDates[service.id] },
+          { service_id: service.id, service_date: service.selectedDate },
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
         console.log("Service requested successfully:", response.data);
-        alert(`Service '${service.name}' requested successfully for ${serviceDates[service.id]}!`);
+        alert(`Service '${service.name}' requested successfully for ${service.selectedDate}!`);
         
-        serviceDates[service.id] = "";
+        service.selectedDate = "";
         
       } catch (error) {
         console.error("Error requesting service:", error.response);
@@ -146,16 +141,18 @@ export default {
     return {
       categories,
       selectedCategory,
-      serviceDates,
+      servicesWithDates,
       customerName,
       todayDate,
       selectCategory,
       requestService,
-      logDateChange,
+      updateServiceDate,
     };
   },
 };
 </script>
+
+
 
 <style scoped>
 
