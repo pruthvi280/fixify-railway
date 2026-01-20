@@ -172,7 +172,7 @@ class ManageProfessionals(Resource):
             "id": professional.id,
             "name": professional.username,
             "service": professional.Professional_dets.service.name if professional.Professional_dets and professional.Professional_dets.service else "N/A",
-            "resume": url_for('serve_uploaded_file', filename=os.path.basename(professional.Professional_dets.document), _external=True) 
+            "resume": f"/uploads/{os.path.basename(professional.Professional_dets.document)}"
             if professional.Professional_dets and professional.Professional_dets.document else None,
             "status": "Approved" if professional.approved else "Blocked" if professional.is_blocked else "Pending",
           }
