@@ -32,13 +32,15 @@
                 <p class="card-text price-text"><strong>Price: </strong> ₹{{ service.base_price }}</p>
 
                 <label :for="'date-' + service.id">Select Service Date:</label>
+                <p style="color: red; font-size: 12px;">DEBUG: Service ID={{ service.id }}, Date={{ serviceDates[service.id] }}</p>
                 <input 
                   :id="'date-' + service.id"
                   :key="'date-input-' + service.id" 
                   type="date" 
                   v-model="serviceDates[service.id]"
                   class="form-control mb-2" 
-                  :min="todayDate" 
+                  :min="todayDate"
+                  @input="logDateChange(service.id)"
                 />
 
                 <button @click="requestService(service)" class="btn btn-success request-btn">Request Service</button>
@@ -86,11 +88,19 @@ export default {
         // Initialize dates for each service
         response.data.forEach(service => {
           serviceDates[service.id] = "";
+          console.log(`Initialized service ${service.id} with empty date`);
         });
+        
+        console.log("All service dates after init:", JSON.stringify(serviceDates));
 
       } catch (error) {
         console.error("Error fetching services:", error);
       }
+    };
+
+    const logDateChange = (serviceId) => {
+      console.log(`Service ${serviceId} date changed to: ${serviceDates[serviceId]}`);
+      console.log("Current all dates:", JSON.stringify(serviceDates));
     };
 
     const requestService = async (service) => {
@@ -141,10 +151,12 @@ export default {
       todayDate,
       selectCategory,
       requestService,
+      logDateChange,
     };
   },
 };
 </script>
+
 <style scoped>
 
 .container {
