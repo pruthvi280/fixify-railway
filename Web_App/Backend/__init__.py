@@ -37,10 +37,6 @@ def create_app():
             "role": user.role
         }
     
-    @jwt.user_lookup_loader
-    def user_lookup_callback(_jwt_header, jwt_data):
-        identity = jwt_data["sub"]
-        return User.query.filter_by(id=identity["id"]).one_or_none()
     
     # File serving route
     @app.route('/uploads/<path:filename>')
