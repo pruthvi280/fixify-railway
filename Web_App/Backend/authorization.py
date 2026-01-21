@@ -72,8 +72,8 @@ class SignUp(Resource):
       db.session.add(new_user)
       db.session.commit()
     
-      token_access=create_access_token(
-          identity=user,
+      token_access = create_access_token(
+          identity=new_user,
           expires_delta=timedelta(hours=3)
       )
 
