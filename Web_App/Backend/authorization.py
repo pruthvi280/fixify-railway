@@ -73,7 +73,7 @@ class SignUp(Resource):
       db.session.commit()
     
       token_access=create_access_token(identity={"id":new_user.id,"role":new_user.role}, expires_delta=timedelta(hours=3))
-      print(f"🔍 LOGIN: Created token for user {user.id}, type={type(user.id)}, identity={{'id':{user.id},'role':'{user.role}'}}")
+      
       response = {
         "user_id": new_user.id,
         "username": new_user.username,
@@ -181,7 +181,6 @@ class Login(Resource):
 
         # Generate JWT Token
         token_access = create_access_token(identity={"id": user.id, "role": user.role},expires_delta=timedelta(hours=3))
-        print(f"🔍 SIGNUP: Created token for user {new_user.id}, type={type(new_user.id)}")
         response = {
             "user_id": user.id,
             "username": user.username,
