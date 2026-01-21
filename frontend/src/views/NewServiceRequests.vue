@@ -2,46 +2,50 @@
   <div class="container">
     <main class="main-content">
       <header class="my-4 text-center">
-        <h1 class="welcome-text">"Hey {{ customerName }}, Let's Get Your Service Booked in Minutes!"</h1>
+        <h1 class="welcome-text">"Hey {{ customerName }}, Let's Get Your Service Booked!"</h1>
       </header>
 
       <section class="content">
         <div v-if="!selectedCategory" class="row">
           <div v-for="category in categories" :key="category.id" class="col-md-4 mb-4">
-            <div class="card category-card">
-              <div class="card-body">
-                <h5 class="card-title">{{ category.name }}</h5>
-                <p class="card-text">{{ category.description }}</p>
-                <button @click="selectCategory(category)" class="btn btn-primary">View Services</button>
+            <div class="card category-card h-100 shadow-sm">
+              <div class="card-body text-center">
+                <h5 class="card-title fw-bold">{{ category.name }}</h5>
+                <p class="card-text text-muted">{{ category.description }}</p>
+                <button @click="selectCategory(category)" class="btn btn-primary w-100">View Services</button>
               </div>
             </div>
           </div>
         </div>
 
         <div v-if="selectedCategory" class="row">
-          <div class="col-12 mb-3">
-            <h3 class="category-heading">Quality Services in "{{ selectedCategory.name }}" – Just for You!</h3>
-            <button @click="selectedCategory = null" class="btn btn-secondary">Back to Categories</button>
+          <div class="col-12 mb-4 d-flex justify-content-between align-items-center">
+            <h3 class="category-heading text-primary">Services in "{{ selectedCategory.name }}"</h3>
+            <button @click="selectedCategory = null" class="btn btn-outline-secondary">Back to Categories</button>
           </div>
-          
-          <div v-for="(service, index) in servicesWithDates" :key="service.id" class="col-md-4 mb-4">
-            <div class="card service-card">
-              <div class="card-body">
-                <h5 class="card-title service-title">{{ service.name }}</h5>
-                <p class="card-text">{{ service.description }}</p>
-                <p class="card-text price-text"><strong>Price: </strong> ₹{{ service.base_price }}</p>
 
-                <label :for="'date-' + service.id">Select Service Date:</label>
-                <input 
-                  :id="'date-' + service.id"
-                  type="date" 
-                  :value="service.selectedDate"
-                  @input="updateServiceDate(index, $event.target.value)"
-                  class="form-control mb-2" 
-                  :min="todayDate" 
-                />
+          <div v-for="service in services" :key="service.id" class="col-md-4 mb-4">
+            <div class="card service-card h-100 shadow">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title fw-bold text-dark">{{ service.name }}</h5>
+                <p class="card-text text-muted small">{{ service.description }}</p>
+                <h4 class="text-success mb-3">₹{{ service.base_price }}</h4>
 
-                <button @click="requestService(service)" class="btn btn-success request-btn">Request Service</button>
+                <div class="mt-auto">
+                  <label :for="'date-' + service.id" class="form-label fw-semibold">Select Date:</label>
+                  
+                  <input 
+                    :id="'date-' + service.id"
+                    type="date" 
+                    class="form-control mb-3"
+                    v-model="service.selected_date"
+                    :min="todayDate"
+                  />
+
+                  <button @click="requestService(service)" class="btn btn-success w-100 fw-bold">
+                    Request Service
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -53,19 +57,19 @@
 
 <script>
 import { ref, computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
 import axios from "axios";
 import store from "@/store";
+import { useRouter } from "vue-router";
 
 export default {
   name: "NewServiceRequest",
   setup() {
     const categories = ref([]);
     const selectedCategory = ref(null);
-    const servicesWithDates = ref([]);
+    const services = ref([]); // We use a simple ref array
     const router = useRouter();
 
-    const customerName = computed(() => store.state.user ? store.state.user.username : "customer");
+    const customerName = computed(() => store.state.user ? store.state.user.username : "Customer");
     const todayDate = computed(() => new Date().toISOString().split("T")[0]);
 
     const fetchCategories = async () => {
@@ -82,57 +86,45 @@ export default {
       try {
         const response = await axios.get(`/getservices/${category.id}`);
         
-        // Create new array with selectedDate property
-        servicesWithDates.value = response.data.map(service => ({
-          ...service,
-          selectedDate: ""
+        // FIX: Initialize the array. Add a 'selected_date' property to EVERY service object.
+        // This ensures every service has its own independent date storage.
+        services.value = response.data.map(service => ({
+            ...service,
+            selected_date: "" 
         }));
-
+        
       } catch (error) {
         console.error("Error fetching services:", error);
       }
     };
 
-    const updateServiceDate = (index, newDate) => {
-      servicesWithDates.value[index].selectedDate = newDate;
-      console.log(`Updated service ${servicesWithDates.value[index].id} at index ${index} to ${newDate}`);
-    };
-
     const requestService = async (service) => {
       const token = localStorage.getItem("token");
-
       if (!token) {
-        alert("You are not logged in. Please log in first.");
+        alert("Please log in first.");
         router.push("/login");
         return;
       }
 
-      if (!service.selectedDate) {
-        alert("Please select a service date for this service.");
+      if (!service.selected_date) {
+        alert("Please select a date first!");
         return;
       }
 
       try {
+        // Send the specific service's date
         const response = await axios.post(
           "/request_service",
-          { service_id: service.id, service_date: service.selectedDate },
+          { service_id: service.id, service_date: service.selected_date },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-
-        console.log("Service requested successfully:", response.data);
-        alert(`Service '${service.name}' requested successfully for ${service.selectedDate}!`);
         
-        service.selectedDate = "";
+        alert("Service requested successfully!");
+        service.selected_date = ""; // Reset just this service's date
         
       } catch (error) {
-        console.error("Error requesting service:", error.response);
-
-        if (error.response && error.response.status === 401) {
-          alert("Session expired. Please log in again.");
-          router.push("/login");
-        } else {
-          alert("There was an issue with your request.");
-        }
+        console.error("Request failed:", error);
+        alert(error.response?.data?.message || "There was an issue with your request.");
       }
     };
 
@@ -141,16 +133,16 @@ export default {
     return {
       categories,
       selectedCategory,
-      servicesWithDates,
+      services,
       customerName,
       todayDate,
       selectCategory,
-      requestService,
-      updateServiceDate,
+      requestService
     };
   },
 };
 </script>
+
 
 
 

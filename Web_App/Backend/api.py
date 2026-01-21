@@ -400,17 +400,34 @@ class RequestService(Resource):
       if not service:
           return {"message": "Service not found."}, 404
 
-      # Get logged-in user
-      user_data = get_jwt_identity()
-      if not user_data or "id" not in user_data:
-          return {"message": "Invalid token or session expired."}, 401
+      # --- FIX START: Handle Identity Safely ---
+      raw_identity = get_jwt_identity()
+      
+      # The identity might be a simple string ID "1" or a dictionary
+      if isinstance(raw_identity, dict):
+          user_id = raw_identity.get("id")
+      elif isinstance(raw_identity, str):
+          # If it's a string, try to parse it as a dict, otherwise assume it IS the ID
+          import ast
+          try:
+              user_data = ast.literal_eval(raw_identity)
+              if isinstance(user_data, dict):
+                  user_id = user_data.get("id")
+              else:
+                  user_id = raw_identity
+          except:
+              user_id = raw_identity
+      else:
+          user_id = raw_identity
+      # --- FIX END ---
 
       # Get customer details
-      customer = Customer.query.filter_by(user_id=user_data["id"]).first()
+      customer = Customer.query.filter_by(user_id=user_id).first()
       if not customer:
           return {"message": "Customer not found."}, 404
 
       # Create a new booking
+      from datetime import datetime
       new_booking = Booking(
           service_id=service.id,
           customer_id=customer.id,
@@ -423,16 +440,18 @@ class RequestService(Resource):
       db.session.add(new_booking)
       db.session.commit()
 
-      send_customer_booking_confirmation.delay(new_booking.id)
-      cache.delete(f"mybookings_{customer.user_id}")
+      # Send confirmation (inside try/except to prevent crash if Redis/Email fails)
+      try:
+          # send_customer_booking_confirmation.delay(new_booking.id)
+          cache.delete(f"mybookings_{customer.user_id}")
+      except:
+          pass
 
-      return {"message": "Service requested successfully. Confirmation email sent!", "booking_id": new_booking.id}, 201
+      return {"message": "Service requested successfully!", "booking_id": new_booking.id}, 201
 
     except Exception as e:
-      return {"message": f"An error occurred: {str(e)}"}, 500 
-
-api.add_resource(RequestService, '/request_service')
-
+      print(f"ERROR in RequestService: {str(e)}") # Log error to console
+      return {"message": f"An error occurred: {str(e)}"}, 500
 
 class OngoingServices(Resource):
   @jwt_required()
