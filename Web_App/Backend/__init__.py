@@ -32,7 +32,10 @@ def create_app():
     
     @jwt.user_identity_loader
     def user_identity_lookup(user):
-        return str(user)
+        return {
+            "id": user.id,
+            "role": user.role
+        }
     
     @jwt.user_lookup_loader
     def user_lookup_callback(_jwt_header, jwt_data):
