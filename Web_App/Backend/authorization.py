@@ -1,220 +1,184 @@
-from flask import Blueprint, request, flash, redirect, url_for, jsonify
-from flask_restful import Resource, reqparse, abort, fields, marshal_with, Api
-from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity, get_jwt
+from flask import Blueprint, request
+from flask_restful import Resource, reqparse, abort, fields, marshal_with
+from flask_jwt_extended import jwt_required, create_access_token, get_jwt
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import User,Professional,Customer,Service
+from .models import User, Professional, Customer, Service
 from .database import db
 import os
 from datetime import timedelta
 
+authorizarion = Blueprint("authorization", __name__)
 
+# -------------------- SIGNUP --------------------
 
-authorizarion=Blueprint('authorization',__name__)
-
-signup_parser=reqparse.RequestParser()
-signup_parser.add_argument("name",type=str,help='Username is required',required=True)
-signup_parser.add_argument("email",type=str,help='Email is required',required=True)
-signup_parser.add_argument("password",type=str,help='Password is required',required=True)
-signup_parser.add_argument("role",type=str,help='Role (customer or professional) is required',required=True)
-signup_parser.add_argument("phone", type=str, help="Phone number is required", required=False)
-signup_parser.add_argument("address", type=str, help="Address is required", required=False)
-signup_parser.add_argument("document", type=str, help="Document is required for professionals", required=False)
-signup_parser.add_argument("service", type=str, help="Service  is required for professionals", required=False)
-
-
-user_fields={
-  "user_id":fields.Integer,
-  "username":fields.String,
-  "email":fields.String,
-  "role":fields.String,
-  "token":fields.String
+user_fields = {
+    "user_id": fields.Integer,
+    "username": fields.String,
+    "email": fields.String,
+    "role": fields.String,
+    "token": fields.String,
 }
 
-
 class SignUp(Resource):
-  @marshal_with(user_fields)
-  def post(self):
-    username = request.form.get("name")
-    email = request.form.get("email")
-    password = request.form.get("password")
-    confirm_password = request.form.get("confirmPassword")
-    role = request.form.get("role")
-    phone_no = request.form.get("phone")
-    address = request.form.get("address")
-    service = request.form.get("service")
-    
-    if role not in ["customer", "professional"]:
-      abort(400,message='Invalid role.The role should be either professional or customer')
-    
-    user=User.query.filter_by(email=email).first()
-    if user:
-      abort(409,message="Email is already exists.")
+    @marshal_with(user_fields)
+    def post(self):
+        username = request.form.get("name")
+        email = request.form.get("email")
+        password = request.form.get("password")
+        role = request.form.get("role")
+        phone_no = request.form.get("phone")
+        address = request.form.get("address")
+        service_name = request.form.get("service")
 
-    if role == "customer":
-        approved = True  # Customers are automatically approved
-    else:
-        approved = False  # Professionals need admin approval, so initially set to False
-    
-    
+        if role not in ["customer", "professional"]:
+            abort(400, message="Invalid role")
 
-    # If role is customer, create a Customer record
-    if role == "customer":
-      new_customer = Customer(phone_no=phone_no, address=address)
-      new_user=User(
-        username=username,
-        email=email,
-        password=generate_password_hash(password,method='scrypt'),
-        role=role,
-        approved=approved,
-        customer_dets = new_customer,
-      )
+        if User.query.filter_by(email=email).first():
+            abort(409, message="Email already exists")
 
-      db.session.add(new_user)
-      db.session.commit()
-    
-      token_access = create_access_token(
-          identity=new_user,
-          expires_delta=timedelta(hours=3)
-      )
+        approved = True if role == "customer" else False
 
-      response = {
-        "user_id": new_user.id,
-        "username": new_user.username,
-        "email": new_user.email,
-        "token": token_access,
-        "role": new_user.role,
-        "approved": new_user.approved
-      }
-      return response, 201
+        # ---------------- CUSTOMER SIGNUP ----------------
+        if role == "customer":
+            new_user = User(
+                username=username,
+                email=email,
+                password=generate_password_hash(password, method="scrypt"),
+                role="customer",
+                approved=True,
+            )
 
-    # If role is professional, create a Professional record
-    elif role == "professional":
+            db.session.add(new_user)
+            db.session.commit()  # get new_user.id
 
-      from flask import current_app
-      UPLOAD_FOLDER = current_app.config.get('UPLOAD_FOLDER', '/app/storage/uploads') 
-      os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+            new_customer = Customer(
+                user_id=new_user.id,
+                phone_no=phone_no,
+                address=address,
+            )
 
-      # Handle file upload
-      if "document" not in request.files:
-          return {"message": "No document uploaded"}, 400
+            db.session.add(new_customer)
+            db.session.commit()
 
-      file = request.files["document"]
-      if file.filename == "":
-          return {"message": "No file selected"}, 400
+            token = create_access_token(
+                identity=new_user,
+                expires_delta=timedelta(hours=3),
+            )
 
-      file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-      file.save(file_path)
+            return {
+                "user_id": new_user.id,
+                "username": new_user.username,
+                "email": new_user.email,
+                "role": new_user.role,
+                "token": token,
+            }, 201
 
-        # Validate service_id if provided
-      path = file.filename
-      if service:
-          service = Service.query.filter_by(name = service).first()
-          print(service)
-          if not service:
-            abort(400, message="Invalid service .")
+        # ---------------- PROFESSIONAL SIGNUP ----------------
+        from flask import current_app
 
-      new_professional = Professional(
-          phone_no=phone_no,
-          address=address,
-          document=path,
-          service=service
-      )
-      new_user=User(
-        username=username,
-        email=email,
-        password=generate_password_hash(password,method='scrypt'),
-        role=role,
-        approved=approved,
-        Professional_dets = new_professional
-      )
+        UPLOAD_FOLDER = current_app.config.get(
+            "UPLOAD_FOLDER", "/app/storage/uploads"
+        )
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-      db.session.add(new_user)
-      db.session.commit()  # Commit all changes
+        if "document" not in request.files:
+            abort(400, message="No document uploaded")
 
-    
+        file = request.files["document"]
+        if file.filename == "":
+            abort(400, message="No file selected")
 
-      response={
-        "user_id":new_user.id,
-        "username":new_user.username,
-        "email":new_user.email,
-        # "token":token_access,
-        "role":new_user.role,
-        "approved": new_user.approved
-      }
-      
-      return response,201
-  
-login_parser=reqparse.RequestParser()
-login_parser.add_argument("email",type=str,help='This field is mandatory to fill',required=True)
-login_parser.add_argument("password",type=str,help="This field is mandatory to fill",required=True)
+        file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(file_path)
 
-login_fields={
-  "user_id":fields.Integer,
-  "username":fields.String,
-  "email":fields.String,
-  "role":fields.String,
-  "token":fields.String,
-  "approved": fields.Boolean 
-  }
+        service = None
+        if service_name:
+            service = Service.query.filter_by(name=service_name).first()
+            if not service:
+                abort(400, message="Invalid service")
 
+        new_professional = Professional(
+            phone_no=phone_no,
+            address=address,
+            document=file.filename,
+            service=service,
+        )
+
+        new_user = User(
+            username=username,
+            email=email,
+            password=generate_password_hash(password, method="scrypt"),
+            role="professional",
+            approved=False,
+            Professional_dets=new_professional,
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return {
+            "user_id": new_user.id,
+            "username": new_user.username,
+            "email": new_user.email,
+            "role": new_user.role,
+        }, 201
+
+
+# -------------------- LOGIN --------------------
+
+login_parser = reqparse.RequestParser()
+login_parser.add_argument("email", type=str, required=True)
+login_parser.add_argument("password", type=str, required=True)
 
 class Login(Resource):
     def post(self):
-        req_args = login_parser.parse_args()
-        email = req_args["email"]
-        password = req_args["password"]
-
-        print(f"🔍 Login attempt: Email={email}, Password={password}")
-
+        args = login_parser.parse_args()
+        email = args["email"]
+        password = args["password"]
 
         user = User.query.filter_by(email=email).first()
-        print(f"🔍 User found: {user}")
-
         if not user:
-            abort(401, description="User does not exist")
+            abort(401, message="User does not exist")
 
         if user.is_blocked:
             return {"blocked": True, "message": "User is blocked"}, 200
 
         if not check_password_hash(user.password, password):
-            abort(403, description="Incorrect Password")
+            abort(403, message="Incorrect password")
 
         if user.role == "professional" and not user.approved:
-            return {"approved": False, "message": "User is not approved yet"}, 200
+            return {"approved": False, "message": "Not approved"}, 200
 
-        # Generate JWT Token
-        token_access = create_access_token(
+        token = create_access_token(
             identity=user,
-            expires_delta=timedelta(hours=3)
+            expires_delta=timedelta(hours=3),
         )
 
-        response = {
+        return {
             "user_id": user.id,
             "username": user.username,
             "email": user.email,
             "role": user.role,
-            "token": token_access,
+            "token": token,
             "approved": user.approved,
-            "blocked": False
-        }
-
-        return response, 200
+        }, 200
 
 
-blacklist=set()
+# -------------------- LOGOUT --------------------
+
+blacklist = set()
 
 class Logout(Resource):
-  @jwt_required()
-  def post(self):
-    jti=get_jwt()["jti"]
-    print(jti)
-    blacklist.add(jti)
-
-    return {"message":"Your are logged out successfully"},200
-  
+    @jwt_required()
+    def post(self):
+        jti = get_jwt()["jti"]
+        blacklist.add(jti)
+        return {"message": "Logged out successfully"}, 200
 
 
+# -------------------- PING --------------------
 
 class Ping(Resource):
     def get(self):
         return {"message": "Backend is alive"}, 200
+
