@@ -72,8 +72,11 @@ class SignUp(Resource):
       db.session.add(new_user)
       db.session.commit()
     
-      token_access=create_access_token(identity={"id":new_user.id,"role":new_user.role}, expires_delta=timedelta(hours=3))
-      
+      token_access=create_access_token(
+          identity=user,
+          expires_delta=timedelta(hours=3)
+      )
+
       response = {
         "user_id": new_user.id,
         "username": new_user.username,
@@ -180,7 +183,11 @@ class Login(Resource):
             return {"approved": False, "message": "User is not approved yet"}, 200
 
         # Generate JWT Token
-        token_access = create_access_token(identity={"id": user.id, "role": user.role},expires_delta=timedelta(hours=3))
+        token_access = create_access_token(
+            identity=user,
+            expires_delta=timedelta(hours=3)
+        )
+
         response = {
             "user_id": user.id,
             "username": user.username,
