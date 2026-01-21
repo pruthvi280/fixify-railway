@@ -381,78 +381,77 @@ api.add_resource(MostPopularService, "/most_popular_service")
 ##########################################above api is for admin######################
 
 class RequestService(Resource):
-  @jwt_required()
-  def post(self):
-    try:
-      # Get request data
-      data = request.get_json()
-      service_id = data.get("service_id")
-      service_date = data.get("service_date")
+    @jwt_required()
+    def post(self):
+        try:
+            # Get request data
+            data = request.get_json()
+            service_id = data.get("service_id")
+            service_date = data.get("service_date")
 
-      # Validate required fields
-      if not service_id:
-          return {"message": "Service ID is required."}, 400
-      if not service_date:
-          return {"message": "Service date is required."}, 400
+            # Validate required fields
+            if not service_id:
+                return {"message": "Service ID is required."}, 400
+            if not service_date:
+                return {"message": "Service date is required."}, 400
 
-      # Check if service exists
-      service = Service.query.get(service_id)
-      if not service:
-          return {"message": "Service not found."}, 404
+            # Check if service exists
+            service = Service.query.get(service_id)
+            if not service:
+                return {"message": "Service not found."}, 404
 
-      # --- FIX START: Handle Identity Safely ---
-      raw_identity = get_jwt_identity()
-      
-      # The identity might be a simple string ID "1" or a dictionary
-      if isinstance(raw_identity, dict):
-          user_id = raw_identity.get("id")
-      elif isinstance(raw_identity, str):
-          # If it's a string, try to parse it as a dict, otherwise assume it IS the ID
-          import ast
-          try:
-              user_data = ast.literal_eval(raw_identity)
-              if isinstance(user_data, dict):
-                  user_id = user_data.get("id")
-              else:
-                  user_id = raw_identity
-          except:
-              user_id = raw_identity
-      else:
-          user_id = raw_identity
-      # --- FIX END ---
+            # Handle Identity Safely
+            raw_identity = get_jwt_identity()
+            
+            # Logic to handle both string and dict identities
+            if isinstance(raw_identity, dict):
+                user_id = raw_identity.get("id")
+            elif isinstance(raw_identity, str):
+                import ast
+                try:
+                    user_data = ast.literal_eval(raw_identity)
+                    if isinstance(user_data, dict):
+                        user_id = user_data.get("id")
+                    else:
+                        user_id = raw_identity
+                except:
+                    user_id = raw_identity
+            else:
+                user_id = raw_identity
 
-      # Get customer details
-      customer = Customer.query.filter_by(user_id=user_id).first()
-      if not customer:
-          return {"message": "Customer not found."}, 404
+            # Get customer details
+            customer = Customer.query.filter_by(user_id=user_id).first()
+            if not customer:
+                return {"message": "Customer not found."}, 404
 
-      # Create a new booking
-      from datetime import datetime
-      new_booking = Booking(
-          service_id=service.id,
-          customer_id=customer.id,
-          professional_id=None,
-          service_date=datetime.strptime(service_date, "%Y-%m-%d"),
-          date=datetime.now()
-      )
+            # Create a new booking
+            from datetime import datetime
+            new_booking = Booking(
+                service_id=service.id,
+                customer_id=customer.id,
+                professional_id=None,
+                service_date=datetime.strptime(service_date, "%Y-%m-%d"),
+                date=datetime.now()
+            )
 
-      # Save booking to the database
-      db.session.add(new_booking)
-      db.session.commit()
+            # Save booking to the database
+            db.session.add(new_booking)
+            db.session.commit()
 
-      # Send confirmation (inside try/except to prevent crash if Redis/Email fails)
-      try:
-          # send_customer_booking_confirmation.delay(new_booking.id)
-          cache.delete(f"mybookings_{customer.user_id}")
-      except:
-          pass
+            # Attempt to clear cache (safe)
+            try:
+                cache.delete(f"mybookings_{customer.user_id}")
+            except:
+                pass
 
-      return {"message": "Service requested successfully!", "booking_id": new_booking.id}, 201
+            return {"message": "Service requested successfully!", "booking_id": new_booking.id}, 201
 
-    except Exception as e:
-      print(f"ERROR in RequestService: {str(e)}") # Log error to console
-      return {"message": f"An error occurred: {str(e)}"}, 500
+        except Exception as e:
+            print(f"ERROR in RequestService: {str(e)}")
+            return {"message": f"An error occurred: {str(e)}"}, 500
 
+# ENSURE THIS LINE IS UN-INDENTED (At the very left)
+api.add_resource(RequestService, '/request_service')
 class OngoingServices(Resource):
   @jwt_required()
   def get(self):
